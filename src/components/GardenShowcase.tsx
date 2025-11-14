@@ -3,7 +3,11 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Sprout, Leaf, Flower2 } from "lucide-react";
 
-const GardenShowcase = () => {
+interface GardenShowcaseProps {
+  onAuthOpen: () => void;
+}
+
+const GardenShowcase = ({ onAuthOpen }: GardenShowcaseProps) => {
   return (
     <section className="py-24 px-6 bg-background">
       <div className="container mx-auto max-w-6xl">
@@ -55,7 +59,7 @@ const GardenShowcase = () => {
               </li>
             </ul>
 
-            <Button variant="growth" size="lg">
+            <Button variant="growth" size="lg" onClick={onAuthOpen}>
               Start Your Garden
             </Button>
           </div>
