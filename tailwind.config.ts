@@ -13,6 +13,20 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Poppins', 'system-ui', 'sans-serif'],
+        reading: ['Merriweather', 'Georgia', 'serif'],
+      },
+      fontSize: {
+        'h1': ['44px', { lineHeight: '1.2', fontWeight: '600' }],
+        'h2': ['28px', { lineHeight: '1.3', fontWeight: '500' }],
+        'h3': ['20px', { lineHeight: '1.4', fontWeight: '500' }],
+        'body': ['17px', { lineHeight: '1.6', fontWeight: '400' }],
+        'hint': ['14px', { lineHeight: '1.5', fontWeight: '400' }],
+      },
+      spacing: {
+        'unit': '10px',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -22,6 +36,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          glow: "hsl(var(--primary-glow))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -47,21 +62,27 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+        growth: {
+          vine: "hsl(var(--growth-vine))",
+          leaf: "hsl(var(--leaf-pop))",
+          achievement: "hsl(var(--achievement-glow))",
         },
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 4px)",
+        sm: "calc(var(--radius) - 8px)",
+        organic: "20px",
+      },
+      boxShadow: {
+        'soft': 'var(--shadow-soft)',
+        'medium': 'var(--shadow-medium)',
+        'glow': 'var(--shadow-glow)',
+      },
+      backgroundImage: {
+        'gradient-growth': 'var(--gradient-growth)',
+        'gradient-achievement': 'var(--gradient-achievement)',
+        'gradient-subtle': 'var(--gradient-subtle)',
       },
       keyframes: {
         "accordion-down": {
