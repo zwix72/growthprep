@@ -2,7 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Sprout, TrendingUp, Award } from "lucide-react";
 import heroGarden from "@/assets/hero-garden.jpg";
 
-const Hero = () => {
+interface HeroProps {
+  onAuthOpen: () => void;
+}
+
+const Hero = ({ onAuthOpen }: HeroProps) => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
@@ -45,7 +49,7 @@ const Hero = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-          <Button variant="hero" size="lg" className="min-w-[200px]">
+          <Button variant="hero" size="lg" className="min-w-[200px]" onClick={onAuthOpen}>
             <Sprout className="w-5 h-5" />
             Start Growing Today
           </Button>

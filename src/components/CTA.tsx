@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Sprout, ArrowRight } from "lucide-react";
 
-const CTA = () => {
+interface CTAProps {
+  onAuthOpen: () => void;
+}
+
+const CTA = ({ onAuthOpen }: CTAProps) => {
   return (
     <section className="py-24 px-6 bg-gradient-growth relative overflow-hidden">
       {/* Decorative Elements */}
@@ -29,6 +33,7 @@ const CTA = () => {
           <Button 
             size="lg" 
             className="min-w-[220px] bg-white text-primary hover:bg-white/90 shadow-glow font-semibold serene-transition hover:scale-[1.02]"
+            onClick={onAuthOpen}
           >
             <Sprout className="w-5 h-5" />
             Begin Your Journey
