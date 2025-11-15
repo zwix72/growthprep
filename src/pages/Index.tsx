@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
+import { Navbar } from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import GardenShowcase from "@/components/GardenShowcase";
@@ -38,6 +39,7 @@ const Index = () => {
 
   return (
     <main className="min-h-screen bg-background">
+      <Navbar />
       <Hero onAuthOpen={() => setAuthModalOpen(true)} />
       <Features />
       <GardenShowcase onAuthOpen={() => setAuthModalOpen(true)} />

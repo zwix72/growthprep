@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
+import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { LogOut, Sprout, Leaf, Flower2, BookOpen, Target } from "lucide-react";
+import { Sprout, Leaf, Flower2, BookOpen, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
@@ -42,14 +43,6 @@ const Dashboard = () => {
     }
   }, [user, loading, navigate]);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Signed out",
-      description: "See you next time! Keep growing. 🌱",
-    });
-    navigate("/");
-  };
 
   if (loading) {
     return (
@@ -68,26 +61,8 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      {/* Header */}
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-organic bg-gradient-growth flex items-center justify-center">
-              <Sprout className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="font-semibold text-foreground">GrowthPrep</h1>
-              <p className="text-hint text-muted-foreground">Your Learning Garden</p>
-            </div>
-          </div>
-
-          <Button variant="ghost" onClick={handleSignOut}>
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </Button>
-        </div>
-      </header>
-
+      <Navbar />
+      
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12 max-w-6xl">
         {/* Welcome Section */}
@@ -193,14 +168,16 @@ const Dashboard = () => {
               <Button
                 size="lg"
                 className="bg-white text-primary hover:bg-white/90 font-semibold"
+                onClick={() => navigate("/tests")}
               >
-                Start Math Practice
+                Take Practice Test
               </Button>
               <Button
                 size="lg"
                 className="bg-white/10 text-white border-2 border-white/30 hover:bg-white/20 backdrop-blur-sm font-semibold"
+                onClick={() => navigate("/topic-practice")}
               >
-                Explore All Subjects
+                Practice by Topic
               </Button>
             </div>
           </div>
