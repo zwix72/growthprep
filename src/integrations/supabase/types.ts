@@ -14,16 +14,297 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          correct_answer: string
+          created_at: string | null
+          difficulty: Database["public"]["Enums"]["question_difficulty"]
+          explanation: string
+          id: string
+          math_domain: Database["public"]["Enums"]["math_domain"] | null
+          module_number: number
+          option_a: string
+          option_b: string
+          option_c: string
+          option_d: string
+          order_index: number | null
+          question_text: string
+          rw_domain: Database["public"]["Enums"]["rw_domain"] | null
+          section: Database["public"]["Enums"]["question_section"]
+          test_id: string | null
+          topic: string | null
+        }
+        Insert: {
+          correct_answer: string
+          created_at?: string | null
+          difficulty: Database["public"]["Enums"]["question_difficulty"]
+          explanation: string
+          id?: string
+          math_domain?: Database["public"]["Enums"]["math_domain"] | null
+          module_number: number
+          option_a: string
+          option_b: string
+          option_c: string
+          option_d: string
+          order_index?: number | null
+          question_text: string
+          rw_domain?: Database["public"]["Enums"]["rw_domain"] | null
+          section: Database["public"]["Enums"]["question_section"]
+          test_id?: string | null
+          topic?: string | null
+        }
+        Update: {
+          correct_answer?: string
+          created_at?: string | null
+          difficulty?: Database["public"]["Enums"]["question_difficulty"]
+          explanation?: string
+          id?: string
+          math_domain?: Database["public"]["Enums"]["math_domain"] | null
+          module_number?: number
+          option_a?: string
+          option_b?: string
+          option_c?: string
+          option_d?: string
+          order_index?: number | null
+          question_text?: string
+          rw_domain?: Database["public"]["Enums"]["rw_domain"] | null
+          section?: Database["public"]["Enums"]["question_section"]
+          test_id?: string | null
+          topic?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_questions: {
+        Row: {
+          id: string
+          question_id: string | null
+          saved_at: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          question_id?: string | null
+          saved_at?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          question_id?: string | null
+          saved_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_questions_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      test_attempts: {
+        Row: {
+          completed_at: string | null
+          id: string
+          math_correct: number | null
+          math_score: number | null
+          math_total: number | null
+          rw_correct: number | null
+          rw_score: number | null
+          rw_total: number | null
+          started_at: string | null
+          test_id: string | null
+          total_score: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          math_correct?: number | null
+          math_score?: number | null
+          math_total?: number | null
+          rw_correct?: number | null
+          rw_score?: number | null
+          rw_total?: number | null
+          started_at?: string | null
+          test_id?: string | null
+          total_score?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          math_correct?: number | null
+          math_score?: number | null
+          math_total?: number | null
+          rw_correct?: number | null
+          rw_score?: number | null
+          rw_total?: number | null
+          started_at?: string | null
+          test_id?: string | null
+          total_score?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "test_attempts_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tests: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_published: boolean | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_published?: boolean | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_published?: boolean | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_answers: {
+        Row: {
+          answered_at: string | null
+          attempt_id: string | null
+          id: string
+          is_correct: boolean | null
+          is_marked: boolean | null
+          question_id: string | null
+          selected_answer: string | null
+          time_spent: number | null
+        }
+        Insert: {
+          answered_at?: string | null
+          attempt_id?: string | null
+          id?: string
+          is_correct?: boolean | null
+          is_marked?: boolean | null
+          question_id?: string | null
+          selected_answer?: string | null
+          time_spent?: number | null
+        }
+        Update: {
+          answered_at?: string | null
+          attempt_id?: string | null
+          id?: string
+          is_correct?: boolean | null
+          is_marked?: boolean | null
+          question_id?: string | null
+          selected_answer?: string | null
+          time_spent?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_answers_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "test_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      math_domain:
+        | "algebra"
+        | "advanced_math"
+        | "problem_solving_data"
+        | "geometry_trig"
+      question_difficulty: "easy" | "medium" | "hard"
+      question_section: "reading_writing" | "math"
+      rw_domain:
+        | "information_ideas"
+        | "craft_structure"
+        | "expression_ideas"
+        | "standard_english"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +431,22 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      math_domain: [
+        "algebra",
+        "advanced_math",
+        "problem_solving_data",
+        "geometry_trig",
+      ],
+      question_difficulty: ["easy", "medium", "hard"],
+      question_section: ["reading_writing", "math"],
+      rw_domain: [
+        "information_ideas",
+        "craft_structure",
+        "expression_ideas",
+        "standard_english",
+      ],
+    },
   },
 } as const
