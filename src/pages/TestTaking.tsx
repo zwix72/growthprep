@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Navbar } from "@/components/Navbar";
-import { Clock, Flag, BookOpen } from "lucide-react";
+import { Clock, Flag, BookOpen, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Question {
@@ -32,6 +32,7 @@ const TestTaking = () => {
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(2 * 60 * 60 + 14 * 60); // 2h 14min in seconds
+  const [showDesmos, setShowDesmos] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -253,6 +254,16 @@ const TestTaking = () => {
               )}
             </div>
             <div className="flex items-center gap-4">
+              {currentQuestion && currentQuestion.section === "math" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowDesmos(!showDesmos)}
+                >
+                  <Calculator className="w-4 h-4 mr-2" />
+                  Calculator
+                </Button>
+              )}
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-muted-foreground" />
                 <span className="text-body font-mono text-foreground">
@@ -275,53 +286,68 @@ const TestTaking = () => {
       </div>
 
       {/* Question Content */}
-      <main className="container mx-auto px-6 py-12 max-w-4xl">
-        {currentQuestion && (
-          <Card className="p-8 mb-6">
-            <div className="prose max-w-none mb-8">
-              <p className="text-body text-foreground whitespace-pre-wrap">
-                {currentQuestion.question_text}
-              </p>
-            </div>
+      <main className="container mx-auto px-6 py-12 max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Question */}
+          {currentQuestion && (
+            <Card className="p-8">
+              <div className="prose max-w-none mb-8">
+                <p className="text-body text-foreground whitespace-pre-wrap">
+                  {currentQuestion.question_text}
+                </p>
+              </div>
 
-            <div className="space-y-3">
-              {["A", "B", "C", "D"].map((option) => {
-                const optionText = currentQuestion[`option_${option.toLowerCase()}` as keyof Question] as string;
-                const isSelected = answers[currentQuestion.id] === option;
-                
-                return (
-                  <button
-                    key={option}
-                    onClick={() => handleAnswer(option)}
-                    className={`w-full text-left p-4 rounded-organic border-2 transition-smooth ${
-                      isSelected
-                        ? "border-primary bg-primary/10"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-semibold ${
-                          isSelected
-                            ? "bg-primary text-white"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {option}
+              <div className="space-y-3">
+                {["A", "B", "C", "D"].map((option) => {
+                  const optionText = currentQuestion[`option_${option.toLowerCase()}` as keyof Question] as string;
+                  const isSelected = answers[currentQuestion.id] === option;
+                  
+                  return (
+                    <button
+                      key={option}
+                      onClick={() => handleAnswer(option)}
+                      className={`w-full text-left p-4 rounded-organic border-2 transition-smooth ${
+                        isSelected
+                          ? "border-primary bg-primary/10"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-semibold ${
+                            isSelected
+                              ? "bg-primary text-white"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {option}
+                        </div>
+                        <span className="text-body text-foreground pt-1">
+                          {optionText}
+                        </span>
                       </div>
-                      <span className="text-body text-foreground pt-1">
-                        {optionText}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </Card>
-        )}
+                    </button>
+                  );
+                })}
+              </div>
+            </Card>
+          )}
+
+          {/* Desmos Calculator for Math */}
+          {currentQuestion && currentQuestion.section === "math" && showDesmos && (
+            <Card className="p-4 h-[700px]">
+              <iframe
+                src="https://www.desmos.com/calculator"
+                className="w-full h-full border-0 rounded"
+                title="Desmos Calculator"
+              />
+            </Card>
+          )}
+        </div>
+
 
         {/* Navigation */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mt-6">
           <Button
             onClick={handlePrevious}
             disabled={currentIndex === 0}

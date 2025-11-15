@@ -8,17 +8,42 @@ import { User } from "@supabase/supabase-js";
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
-    });
+      
+      if (session?.user) {
+        const { data } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .eq('role', 'admin')
+          .single();
+        setIsAdmin(!!data);
+      }
+    };
+    checkAuth();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        const { data } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .eq('role', 'admin')
+          .single();
+        setIsAdmin(!!data);
+      } else {
+        setIsAdmin(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -75,13 +100,15 @@ export const Navbar = () => {
           >
             Analytics
           </Link>
-          <Link
-            to="/admin"
-            className="text-body text-foreground hover:text-primary transition-smooth"
-            onClick={() => setIsOpen(false)}
-          >
-            Admin
-          </Link>
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="text-body text-foreground hover:text-primary transition-smooth"
+              onClick={() => setIsOpen(false)}
+            >
+              Admin
+            </Link>
+          )}
         </>
       ) : null}
       <Link

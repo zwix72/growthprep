@@ -9,6 +9,7 @@ import { Shield, BookOpen, Users, BarChart, Trash2, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CreateTestDialog } from "@/components/admin/CreateTestDialog";
 import { AddQuestionDialog } from "@/components/admin/AddQuestionDialog";
+import { BulkQuestionUpload } from "@/components/admin/BulkQuestionUpload";
 import { Badge } from "@/components/ui/badge";
 
 type Test = {
@@ -210,12 +211,7 @@ const Admin = () => {
                 <h2 className="text-h2 font-semibold text-foreground">
                   Manage Tests
                 </h2>
-                <Button 
-                  className="bg-gradient-growth text-white"
-                  onClick={() => setCreateTestOpen(true)}
-                >
-                  Create New Test
-                </Button>
+                <CreateTestDialog open={createTestOpen} onOpenChange={setCreateTestOpen} onSuccess={loadTests} />
               </div>
 
               <div className="space-y-4">
@@ -276,12 +272,10 @@ const Admin = () => {
                 <h2 className="text-h2 font-semibold text-foreground">
                   Question Bank
                 </h2>
-                <Button 
-                  className="bg-gradient-growth text-white"
-                  onClick={() => setAddQuestionOpen(true)}
-                >
-                  Add Question
-                </Button>
+                <div className="flex gap-2">
+                  <AddQuestionDialog open={addQuestionOpen} onOpenChange={setAddQuestionOpen} onSuccess={loadQuestions} />
+                  <BulkQuestionUpload />
+                </div>
               </div>
 
               <div className="space-y-3">

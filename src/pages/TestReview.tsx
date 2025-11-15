@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle, Flag, BookOpen } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CheckCircle, XCircle, Flag, BookOpen, List } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface UserAnswer {
@@ -33,6 +34,7 @@ const TestReview = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [filter, setFilter] = useState<"all" | "wrong" | "marked">("all");
   const [loading, setLoading] = useState(true);
+  const [navDialogOpen, setNavDialogOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
