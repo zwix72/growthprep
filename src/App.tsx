@@ -11,6 +11,7 @@ import TestResults from "./pages/TestResults";
 import TestReview from "./pages/TestReview";
 import QuestionBank from "./pages/QuestionBank";
 import TopicPractice from "./pages/TopicPractice";
+import TopicPracticeSession from "./pages/TopicPracticeSession";
 import Analytics from "./pages/Analytics";
 import Admin from "./pages/Admin";
 import Donate from "./pages/Donate";
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/test-review/:attemptId" element={<TestReview />} />
           <Route path="/question-bank" element={<QuestionBank />} />
           <Route path="/topic-practice" element={<TopicPractice />} />
+          <Route path="/topic-practice-session" element={<TopicPracticeSession />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/donate" element={<Donate />} />
