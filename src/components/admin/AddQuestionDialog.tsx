@@ -50,7 +50,32 @@ const formSchema = z.object({
   option_d: z.string().min(1, "Option D is required"),
   correct_answer: z.enum(["A", "B", "C", "D"]),
   explanation: z.string().min(1, "Explanation is required"),
-});
+}).refine(
+  (data) => {
+    if (data.question_type === "practice_test" && !data.test_id) {
+      return false;
+    }
+    return true;
+  },
+  {
+    message: "Test selection is required for practice test questions",
+    path: ["test_id"],
+  }
+).refine(
+  (data) => {
+    if (data.section === "reading_writing" && !data.rw_domain) {
+      return false;
+    }
+    if (data.section === "math" && !data.math_domain) {
+      return false;
+    }
+    return true;
+  },
+  {
+    message: "Domain is required",
+    path: ["rw_domain"],
+  }
+);
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -69,10 +94,17 @@ export function AddQuestionDialog({ open, onOpenChange, onSuccess }: AddQuestion
     resolver: zodResolver(formSchema),
     defaultValues: {
       question_type: "practice_test",
+      test_id: "",
       section: "reading_writing",
       module_number: 1,
       difficulty: "medium",
+      question_text: "",
+      option_a: "",
+      option_b: "",
+      option_c: "",
+      option_d: "",
       correct_answer: "A",
+      explanation: "",
     },
   });
 
