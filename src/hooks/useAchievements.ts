@@ -28,20 +28,14 @@ export const useAchievements = (userId: string | undefined) => {
   const [newAchievement, setNewAchievement] = useState<Achievement | null>(null);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [newLevel, setNewLevel] = useState(0);
-  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     if (userId) {
-      loadData();
+      loadStats();
+      loadUnlockedAchievements();
     }
   }, [userId]);
-
-  const loadData = async () => {
-    setLoading(true);
-    await Promise.all([loadStats(), loadUnlockedAchievements()]);
-    setLoading(false);
-  };
 
   const loadStats = async () => {
     if (!userId) return;
@@ -189,7 +183,6 @@ export const useAchievements = (userId: string | undefined) => {
 
   return {
     stats,
-    loading,
     unlockedAchievements,
     newAchievement,
     setNewAchievement,
