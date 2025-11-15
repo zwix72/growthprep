@@ -6,9 +6,13 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Sprout, Leaf, Flower2, BookOpen, Target } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Sprout, Leaf, Flower2, BookOpen, Target, Trophy, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { useAchievements } from "@/hooks/useAchievements";
+import { AchievementNotification } from "@/components/AchievementNotification";
+import { LevelUpModal } from "@/components/LevelUpModal";
 
 interface TestAttempt {
   id: string;
@@ -30,6 +34,15 @@ const Dashboard = () => {
   const [pastAttempts, setPastAttempts] = useState<TestAttempt[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  const {
+    stats,
+    newAchievement,
+    setNewAchievement,
+    showLevelUp,
+    setShowLevelUp,
+    newLevel,
+  } = useAchievements(user?.id);
 
   useEffect(() => {
     // Set up auth state listener
@@ -105,17 +118,21 @@ const Dashboard = () => {
     return null;
   }
 
+  const xpProgress = stats ? (stats.xp / (stats.level * 100)) * 100 : 0;
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <Navbar />
+      <AchievementNotification achievement={newAchievement} onClose={() => setNewAchievement(null)} />
+      <LevelUpModal isOpen={showLevelUp} onClose={() => setShowLevelUp(false)} newLevel={newLevel} />
       
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12 max-w-6xl">
         {/* Welcome Section */}
         <div className="mb-12 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4 animate-leaf-pop">
-            <Flower2 className="w-4 h-4 text-primary" />
-            <span className="text-hint text-primary font-medium">Level 1 Gardener</span>
+            <Trophy className="w-4 h-4 text-primary" />
+            <span className="text-hint text-primary font-medium">Level {stats?.level || 1}</span>
           </div>
           <h2 className="text-h1 md:text-[42px] font-bold mb-3 text-foreground">
             Welcome to Your Garden
@@ -125,39 +142,56 @@ const Dashboard = () => {
           </p>
         </div>
 
+        {/* XP and Level Progress */}
+        <Card className="p-8 mb-12 border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-h2 font-bold text-foreground mb-1">Level {stats?.level || 1}</h3>
+              <p className="text-body text-muted-foreground">
+                {stats?.xp || 0} / {(stats?.level || 1) * 100} XP
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Zap className="w-8 h-8 text-primary animate-pulse" />
+              <span className="text-3xl font-bold text-primary">{stats?.xp || 0}</span>
+            </div>
+          </div>
+          <Progress value={xpProgress} className="h-3" />
+        </Card>
+
         {/* Garden Stats */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <Card className="p-6 growth-hover">
             <div className="flex items-start justify-between mb-4">
               <div className="w-12 h-12 rounded-organic bg-primary/10 flex items-center justify-center">
-                <Sprout className="w-6 h-6 text-primary" />
+                <BookOpen className="w-6 h-6 text-primary" />
               </div>
-              <span className="text-hint text-muted-foreground">This Week</span>
+              <Badge variant="secondary">{stats?.streak_days || 0} days</Badge>
             </div>
-            <div className="text-h2 font-bold text-foreground mb-1">0</div>
-            <div className="text-body text-muted-foreground">Seeds Planted</div>
+            <div className="text-h2 font-bold text-foreground mb-1">{stats?.total_questions_answered || 0}</div>
+            <div className="text-body text-muted-foreground">Questions Answered</div>
           </Card>
 
           <Card className="p-6 growth-hover">
             <div className="flex items-start justify-between mb-4">
               <div className="w-12 h-12 rounded-organic bg-secondary/10 flex items-center justify-center">
-                <Leaf className="w-6 h-6 text-secondary" />
+                <Target className="w-6 h-6 text-secondary" />
               </div>
-              <span className="text-hint text-muted-foreground">Total</span>
+              <Badge variant="secondary">🔥 Streak</Badge>
             </div>
-            <div className="text-h2 font-bold text-foreground mb-1">0</div>
-            <div className="text-body text-muted-foreground">Concepts Growing</div>
+            <div className="text-h2 font-bold text-foreground mb-1">{stats?.streak_days || 0}</div>
+            <div className="text-body text-muted-foreground">Day Streak</div>
           </Card>
 
           <Card className="p-6 growth-hover">
             <div className="flex items-start justify-between mb-4">
               <div className="w-12 h-12 rounded-organic bg-accent/10 flex items-center justify-center">
-                <Flower2 className="w-6 h-6 text-accent" />
+                <Trophy className="w-6 h-6 text-accent" />
               </div>
-              <span className="text-hint text-muted-foreground">Mastered</span>
+              <Badge variant="secondary">Tests</Badge>
             </div>
-            <div className="text-h2 font-bold text-foreground mb-1">0</div>
-            <div className="text-body text-muted-foreground">Topics Bloomed</div>
+            <div className="text-h2 font-bold text-foreground mb-1">{pastAttempts.length}</div>
+            <div className="text-body text-muted-foreground">Tests Completed</div>
           </Card>
         </div>
 
