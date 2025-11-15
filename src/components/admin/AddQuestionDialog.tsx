@@ -31,6 +31,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { MathText } from "@/components/MathText";
+import { Info } from "lucide-react";
 
 const formSchema = z.object({
   question_type: z.enum(["practice_test", "topic_practice"]),
@@ -75,6 +78,11 @@ export function AddQuestionDialog({ open, onOpenChange, onSuccess }: AddQuestion
 
   const questionType = form.watch("question_type");
   const section = form.watch("section");
+  const questionText = form.watch("question_text");
+  const optionA = form.watch("option_a");
+  const optionB = form.watch("option_b");
+  const optionC = form.watch("option_c");
+  const optionD = form.watch("option_d");
 
   useEffect(() => {
     if (open) {
@@ -429,6 +437,50 @@ export function AddQuestionDialog({ open, onOpenChange, onSuccess }: AddQuestion
                 </FormItem>
               )}
             />
+
+            {/* Math Help Card */}
+            <Card className="p-4 bg-blue-50 border-blue-200">
+              <div className="flex gap-2 items-start">
+                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-blue-900">
+                  <p className="font-semibold mb-2">Math Notation Help:</p>
+                  <ul className="space-y-1 text-xs">
+                    <li>• Inline math: <code className="bg-blue-100 px-1 rounded">$x^2$</code> → x²</li>
+                    <li>• Display math: <code className="bg-blue-100 px-1 rounded">$$\frac{`{a}{b}`}$$</code> → fraction a/b</li>
+                    <li>• Fractions: <code className="bg-blue-100 px-1 rounded">\frac{`{3}{4}`}</code></li>
+                    <li>• Powers: <code className="bg-blue-100 px-1 rounded">x^{`{2}`}</code> or <code className="bg-blue-100 px-1 rounded">x^2</code></li>
+                    <li>• Square root: <code className="bg-blue-100 px-1 rounded">\sqrt{`{x}`}</code></li>
+                    <li>• Pi: <code className="bg-blue-100 px-1 rounded">\pi</code>, Modulus: <code className="bg-blue-100 px-1 rounded">|x|</code></li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
+            {/* Preview Section */}
+            {(questionText || optionA || optionB || optionC || optionD) && (
+              <Card className="p-4 bg-gray-50">
+                <h3 className="font-semibold mb-3 text-sm">Preview:</h3>
+                {questionText && (
+                  <div className="mb-4">
+                    <p className="text-xs text-gray-500 mb-1">Question:</p>
+                    <MathText text={questionText} className="text-sm" />
+                  </div>
+                )}
+                <div className="space-y-2">
+                  {[
+                    { label: "A", text: optionA },
+                    { label: "B", text: optionB },
+                    { label: "C", text: optionC },
+                    { label: "D", text: optionD }
+                  ].map(option => option.text && (
+                    <div key={option.label} className="flex gap-2">
+                      <span className="text-xs font-medium text-gray-500">{option.label}.</span>
+                      <MathText text={option.text} className="text-sm flex-1" />
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
 
             <div className="flex justify-end gap-3">
               <Button

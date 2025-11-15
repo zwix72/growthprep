@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Navbar } from "@/components/Navbar";
 import { Clock, Flag, BookOpen, Calculator, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { MathText } from "@/components/MathText";
 
 interface Question {
   id: string;
@@ -283,9 +284,7 @@ const TestTaking = () => {
                   <h2 className="text-xl font-bold mb-6 text-gray-900">Question</h2>
                 )}
                 <div className="prose prose-sm max-w-none">
-                  <p className="text-base text-gray-900 leading-relaxed whitespace-pre-wrap">
-                    {currentQuestion.question_text}
-                  </p>
+                  <MathText text={currentQuestion.question_text} className="text-base text-gray-900 leading-relaxed whitespace-pre-wrap" />
                 </div>
               </>
             )}
@@ -345,9 +344,7 @@ const TestTaking = () => {
                       >
                         {option}
                       </div>
-                      <span className="text-base text-gray-900 pt-0.5">
-                        {optionText}
-                      </span>
+                      <MathText text={optionText} className="text-base text-gray-900 pt-0.5 flex-1" />
                     </div>
                   </button>
                 );

@@ -9,6 +9,7 @@ import { CheckCircle, XCircle, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAchievements } from "@/hooks/useAchievements";
 import { supabase } from "@/integrations/supabase/client";
+import { MathText } from "@/components/MathText";
 
 interface Question {
   id: string;
@@ -139,9 +140,7 @@ const TopicPracticeSession = () => {
       <main className="container mx-auto px-6 py-12 max-w-4xl">
         <Card className="p-8 mb-6">
           <div className="prose max-w-none mb-8">
-            <p className="text-body text-foreground whitespace-pre-wrap">
-              {currentQuestion.question_text}
-            </p>
+            <MathText text={currentQuestion.question_text} className="text-body text-foreground whitespace-pre-wrap" />
           </div>
 
           <div className="space-y-3 mb-6">
@@ -183,9 +182,7 @@ const TopicPracticeSession = () => {
                     >
                       {option}
                     </div>
-                    <span className="text-body text-foreground pt-1 flex-1">
-                      {optionText}
-                    </span>
+                    <MathText text={optionText} className="text-body text-foreground pt-1 flex-1" />
                     {showResult && isCorrectOption && (
                       <CheckCircle className="w-5 h-5 text-green-600" />
                     )}
@@ -213,9 +210,7 @@ const TopicPracticeSession = () => {
               </div>
               <div className="flex items-start gap-2">
                 <BookOpen className="w-4 h-4 text-muted-foreground mt-1" />
-                <p className="text-body text-foreground">
-                  {currentQuestion.explanation}
-                </p>
+                <MathText text={currentQuestion.explanation} className="text-body text-foreground" />
               </div>
             </div>
           )}
