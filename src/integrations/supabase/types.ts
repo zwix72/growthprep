@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          created_at: string | null
+          description: string
+          icon: string
+          id: string
+          key: string
+          name: string
+          requirement_type: string
+          requirement_value: number
+          xp_reward: number
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          icon: string
+          id?: string
+          key: string
+          name: string
+          requirement_type: string
+          requirement_value: number
+          xp_reward?: number
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          icon?: string
+          id?: string
+          key?: string
+          name?: string
+          requirement_type?: string
+          requirement_value?: number
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -212,6 +248,35 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          id: string
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          id?: string
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          id?: string
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_answers: {
         Row: {
           answered_at: string | null
@@ -275,6 +340,42 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_stats: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_activity_date: string | null
+          level: number
+          streak_days: number
+          total_questions_answered: number
+          updated_at: string | null
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_activity_date?: string | null
+          level?: number
+          streak_days?: number
+          total_questions_answered?: number
+          updated_at?: string | null
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_activity_date?: string | null
+          level?: number
+          streak_days?: number
+          total_questions_answered?: number
+          updated_at?: string | null
+          user_id?: string
+          xp?: number
         }
         Relationships: []
       }
