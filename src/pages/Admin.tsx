@@ -211,8 +211,14 @@ const Admin = () => {
                 <h2 className="text-h2 font-semibold text-foreground">
                   Manage Tests
                 </h2>
-                <CreateTestDialog open={createTestOpen} onOpenChange={setCreateTestOpen} onSuccess={loadTests} />
+                <Button 
+                  className="bg-gradient-growth text-white"
+                  onClick={() => setCreateTestOpen(true)}
+                >
+                  Create New Test
+                </Button>
               </div>
+              <CreateTestDialog open={createTestOpen} onOpenChange={setCreateTestOpen} onSuccess={loadTests} />
 
               <div className="space-y-4">
                 {tests.length === 0 ? (
@@ -273,10 +279,16 @@ const Admin = () => {
                   Question Bank
                 </h2>
                 <div className="flex gap-2">
-                  <AddQuestionDialog open={addQuestionOpen} onOpenChange={setAddQuestionOpen} onSuccess={loadQuestions} />
+                  <Button 
+                    className="bg-gradient-growth text-white"
+                    onClick={() => setAddQuestionOpen(true)}
+                  >
+                    Add Question
+                  </Button>
                   <BulkQuestionUpload />
                 </div>
               </div>
+              <AddQuestionDialog open={addQuestionOpen} onOpenChange={setAddQuestionOpen} onSuccess={loadQuestions} />
 
               <div className="space-y-3">
                 {questions.length === 0 ? (
