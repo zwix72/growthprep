@@ -8,11 +8,26 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Sprout, Leaf, Flower2, BookOpen, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+
+interface TestAttempt {
+  id: string;
+  test_id: string;
+  started_at: string;
+  completed_at: string | null;
+  total_score: number | null;
+  rw_score: number | null;
+  math_score: number | null;
+  tests: {
+    title: string;
+  };
+}
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pastAttempts, setPastAttempts] = useState<TestAttempt[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -24,6 +39,9 @@ const Dashboard = () => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) {
+        fetchPastAttempts(session.user.id);
+      }
     });
 
     // Check for existing session
@@ -31,6 +49,9 @@ const Dashboard = () => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) {
+        fetchPastAttempts(session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -42,6 +63,31 @@ const Dashboard = () => {
       navigate("/");
     }
   }, [user, loading, navigate]);
+
+  const fetchPastAttempts = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('test_attempts')
+      .select(`
+        id,
+        test_id,
+        started_at,
+        completed_at,
+        total_score,
+        rw_score,
+        math_score,
+        tests (
+          title
+        )
+      `)
+      .eq('user_id', userId)
+      .not('completed_at', 'is', null)
+      .order('completed_at', { ascending: false })
+      .limit(5);
+
+    if (!error && data) {
+      setPastAttempts(data as TestAttempt[]);
+    }
+  };
 
 
   if (loading) {
@@ -154,6 +200,52 @@ const Dashboard = () => {
             </div>
           </div>
         </Card>
+
+        {/* Past Exams Section */}
+        <div className="mb-12">
+          <h3 className="text-h2 font-semibold mb-6 text-foreground">Recent Test Scores</h3>
+          {pastAttempts.length === 0 ? (
+            <Card className="p-8 text-center">
+              <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground mb-4">No completed exams yet. Start your first practice test!</p>
+              <Button onClick={() => navigate('/tests')} variant="outline">
+                Browse Practice Tests
+              </Button>
+            </Card>
+          ) : (
+            <div className="grid gap-4">
+              {pastAttempts.map((attempt) => (
+                <Card 
+                  key={attempt.id} 
+                  className="p-6 hover:shadow-lg transition-all cursor-pointer growth-hover"
+                  onClick={() => navigate(`/test-results/${attempt.id}`)}
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="text-lg font-semibold text-foreground mb-1">
+                        {attempt.tests.title}
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        {format(new Date(attempt.completed_at!), 'MMM d, yyyy • h:mm a')}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-primary mb-1">
+                        {attempt.total_score || 0}
+                      </div>
+                      <div className="text-xs text-muted-foreground mb-2">out of 1600</div>
+                      <div className="flex gap-3 text-sm text-muted-foreground">
+                        <span>RW: {attempt.rw_score || 0}</span>
+                        <span>•</span>
+                        <span>Math: {attempt.math_score || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Start Practicing CTA */}
         <Card className="p-12 text-center bg-gradient-growth border-0 shadow-glow">
