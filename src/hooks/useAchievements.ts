@@ -32,8 +32,8 @@ export const useAchievements = (userId: string | undefined) => {
 
   useEffect(() => {
     if (userId) {
-      loadStats();
-      loadUnlockedAchievements();
+      // Load both in parallel
+      Promise.all([loadStats(), loadUnlockedAchievements()]);
     }
   }, [userId]);
 
@@ -79,13 +79,15 @@ export const useAchievements = (userId: string | undefined) => {
 
     const { data: allAchievements } = await supabase
       .from('achievements')
-      .select('*');
+      .select('*')
+      .not('key', 'in', `(${unlockedAchievements.join(',')})`); // Only fetch locked achievements
 
     if (!allAchievements) return;
 
-    for (const achievement of allAchievements) {
-      if (unlockedAchievements.includes(achievement.key)) continue;
+    // Process achievements that should be unlocked
+    const toUnlock: Achievement[] = [];
 
+    for (const achievement of allAchievements) {
       let shouldUnlock = false;
 
       switch (achievement.requirement_type) {
@@ -101,8 +103,13 @@ export const useAchievements = (userId: string | undefined) => {
       }
 
       if (shouldUnlock) {
-        await unlockAchievement(achievement);
+        toUnlock.push(achievement);
       }
+    }
+
+    // Unlock all achievements in parallel
+    if (toUnlock.length > 0) {
+      await Promise.all(toUnlock.map(achievement => unlockAchievement(achievement)));
     }
   };
 
