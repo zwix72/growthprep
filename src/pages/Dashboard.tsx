@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Sprout, Leaf, Flower2, BookOpen, Target, Trophy, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 import { useAchievements } from "@/hooks/useAchievements";
 import { AchievementNotification } from "@/components/AchievementNotification";
 import { LevelUpModal } from "@/components/LevelUpModal";
@@ -31,7 +33,6 @@ const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [pastAttempts, setPastAttempts] = useState<TestAttempt[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -44,7 +45,44 @@ const Dashboard = () => {
     newLevel,
   } = useAchievements(user?.id);
 
+  // Use React Query for cached past attempts
+  const { data: pastAttempts = [], isLoading: attemptsLoading } = useQuery({
+    queryKey: ['pastAttempts', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from('test_attempts')
+        .select(`
+          id,
+          test_id,
+          started_at,
+          completed_at,
+          total_score,
+          rw_score,
+          math_score,
+          tests (
+            title
+          )
+        `)
+        .eq('user_id', user.id)
+        .not('completed_at', 'is', null)
+        .order('completed_at', { ascending: false })
+        .limit(5);
+      
+      return data as TestAttempt[] || [];
+    },
+    enabled: !!user?.id,
+    staleTime: 30000, // Cache for 30 seconds
+  });
+
   useEffect(() => {
+    // Check for existing session immediately
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
     // Set up auth state listener
     const {
       data: { subscription },
@@ -52,19 +90,6 @@ const Dashboard = () => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-      if (session?.user) {
-        fetchPastAttempts(session.user.id);
-      }
-    });
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-      if (session?.user) {
-        fetchPastAttempts(session.user.id);
-      }
     });
 
     return () => subscription.unsubscribe();
@@ -77,44 +102,8 @@ const Dashboard = () => {
     }
   }, [user, loading, navigate]);
 
-  const fetchPastAttempts = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('test_attempts')
-      .select(`
-        id,
-        test_id,
-        started_at,
-        completed_at,
-        total_score,
-        rw_score,
-        math_score,
-        tests (
-          title
-        )
-      `)
-      .eq('user_id', userId)
-      .not('completed_at', 'is', null)
-      .order('completed_at', { ascending: false })
-      .limit(5);
 
-    if (!error && data) {
-      setPastAttempts(data as TestAttempt[]);
-    }
-  };
-
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <Sprout className="w-12 h-12 text-primary animate-gentle-float mx-auto mb-4" />
-          <p className="text-body text-muted-foreground">Loading your garden...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
+  if (!user && loading) {
     return null;
   }
 
@@ -161,38 +150,55 @@ const Dashboard = () => {
 
         {/* Garden Stats */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <Card className="p-6 growth-hover">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-organic bg-primary/10 flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-primary" />
-              </div>
-              <Badge variant="secondary">{stats?.streak_days || 0} days</Badge>
-            </div>
-            <div className="text-h2 font-bold text-foreground mb-1">{stats?.total_questions_answered || 0}</div>
-            <div className="text-body text-muted-foreground">Questions Answered</div>
-          </Card>
+          {!stats ? (
+            <>
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <Skeleton className="w-12 h-12 rounded-full" />
+                    <Skeleton className="h-5 w-20" />
+                  </div>
+                  <Skeleton className="h-8 w-16 mb-1" />
+                  <Skeleton className="h-4 w-32" />
+                </Card>
+              ))}
+            </>
+          ) : (
+            <>
+              <Card className="p-6 growth-hover">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 rounded-organic bg-primary/10 flex items-center justify-center">
+                    <BookOpen className="w-6 h-6 text-primary" />
+                  </div>
+                  <Badge variant="secondary">{stats.streak_days} days</Badge>
+                </div>
+                <div className="text-h2 font-bold text-foreground mb-1">{stats.total_questions_answered}</div>
+                <div className="text-body text-muted-foreground">Questions Answered</div>
+              </Card>
 
-          <Card className="p-6 growth-hover">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-organic bg-secondary/10 flex items-center justify-center">
-                <Target className="w-6 h-6 text-secondary" />
-              </div>
-              <Badge variant="secondary">🔥 Streak</Badge>
-            </div>
-            <div className="text-h2 font-bold text-foreground mb-1">{stats?.streak_days || 0}</div>
-            <div className="text-body text-muted-foreground">Day Streak</div>
-          </Card>
+              <Card className="p-6 growth-hover">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 rounded-organic bg-secondary/10 flex items-center justify-center">
+                    <Target className="w-6 h-6 text-secondary" />
+                  </div>
+                  <Badge variant="secondary">🔥 Streak</Badge>
+                </div>
+                <div className="text-h2 font-bold text-foreground mb-1">{stats.streak_days}</div>
+                <div className="text-body text-muted-foreground">Day Streak</div>
+              </Card>
 
-          <Card className="p-6 growth-hover">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-organic bg-accent/10 flex items-center justify-center">
-                <Trophy className="w-6 h-6 text-accent" />
-              </div>
-              <Badge variant="secondary">Tests</Badge>
-            </div>
-            <div className="text-h2 font-bold text-foreground mb-1">{pastAttempts.length}</div>
-            <div className="text-body text-muted-foreground">Tests Completed</div>
-          </Card>
+              <Card className="p-6 growth-hover">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 rounded-organic bg-accent/10 flex items-center justify-center">
+                    <Trophy className="w-6 h-6 text-accent" />
+                  </div>
+                  <Badge variant="secondary">Tests</Badge>
+                </div>
+                <div className="text-h2 font-bold text-foreground mb-1">{pastAttempts.length}</div>
+                <div className="text-body text-muted-foreground">Tests Completed</div>
+              </Card>
+            </>
+          )}
         </div>
 
         {/* Progress Section */}
